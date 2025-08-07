@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EntryPoint : MonoBehaviour
 {
@@ -10,7 +11,12 @@ public class EntryPoint : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
 
-        _gamePlay.Init();
         _uiGamePlay.Setup();
+        _gamePlay.Init(_uiGamePlay);
+    }
+
+    public void Reset()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);   
     }
 }

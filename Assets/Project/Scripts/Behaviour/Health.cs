@@ -3,6 +3,8 @@ using UnityEngine.Events;
 
 public class Health
 {
+    private int _startValue;
+
     public int Value { get; private set; }
 
     public int MaxHealth { get; private set; }
@@ -15,7 +17,7 @@ public class Health
 
     public Health(int value)
     {
-        Value = MaxHealth = value;
+        _startValue = Value = MaxHealth = value;
     }
 
     public void IncreaseHealth(float persent)
@@ -23,7 +25,7 @@ public class Health
         if (persent < 1)
             return;
 
-        MaxHealth = (int)(Value * persent);
+        MaxHealth = (int)(MaxHealth * persent);
         Reset();
     }
 

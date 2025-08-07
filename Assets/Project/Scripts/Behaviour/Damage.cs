@@ -1,12 +1,13 @@
 ﻿public class Damage
 {
+    private float _startValue;
     private int _value = 10;
 
     public int Value => _value;
 
     public Damage(int startDamage)
     { 
-        _value = startDamage;
+        _startValue = _value = startDamage;
     }
 
     public void IncreaseDamage(float percent)

@@ -1,7 +1,9 @@
-﻿public class Counter
+﻿using System;
+
+public class Counter
 {
-    private int _value = 0;
-    public int Value => _value;
+    private float _value = 0;
+    public float Value => _value;
 
     private UICounter _uiCounter;
 
@@ -11,7 +13,16 @@
         Show();
     }
 
-    public void Increase(int value)
+    public void Set(float value)
+    {
+        if (value < 0)
+            return;
+
+        _value = value;
+        Show();
+    }
+
+    public void Increase(float value)
     {
         if (value < 0)
             return;
@@ -20,8 +31,27 @@
         Show();
     }
 
+    public bool TrySpend(float value)
+    { 
+        if (value < 0)
+        {
+            return false;
+        }
+
+        if (_value >= value)
+        {
+            _value -= value;
+            Show();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     private void Show()
     {
-        _uiCounter.SetCount(_value.ToString());
+        _uiCounter.SetCount(Math.Round(_value, 3).ToString());
     }
 }

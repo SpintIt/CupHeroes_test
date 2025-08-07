@@ -3,6 +3,8 @@ using UnityEngine.Events;
 
 public class Player : MonoBehaviour
 {
+    private GamePlay _gamePlay;
+
     [SerializeField] private float _raycastDistance = 5f;
     [SerializeField] private LayerMask _enemyLayer;
 
@@ -18,35 +20,47 @@ public class Player : MonoBehaviour
     [SerializeField, Range(.1f, 5f)] private float _startSpeed = .5f;
     [SerializeField, Range(1, 100)] private int _startDamage = 10;
     [SerializeField, Range(50, 200)] private int _startHealth = 100;
-    private Health _health;
-    private SpeedShoot _speed;
-    private Damage _damage;
+    public Health Health { get; private set; }
+    public SpeedShoot Speed { get; private set; }
+    public Damage Damage { get; private set; }
 
     [Header("Score")]
     [SerializeField] private UICounter _uiCounterCount;
+    [SerializeField] private UICounter _uiCounterSpeed;
+    [SerializeField] private UICounter _uiCounterDamage;
     [SerializeField, Range(1, 5)] private int _countForKill = 1;
-    private Counter _counter;
+    public Counter CounterCount { get; private set; }
+    public Counter CounterSpeed { get; private set; }
+    public Counter CounterDamage { get; private set; }
 
     public event UnityAction OnRun;
     public event UnityAction OnStop;
 
-    public void Init()
+    public void Init(GamePlay gamePlay)
     {
+        _gamePlay = gamePlay;
         _weaponPool = new WeaponPoolHandler(_prefabWeapon, _parentPoolWeapons, _startWeaponCount);
         _weaponSpawner = new(_weaponPool);
-        _speed = new(_startSpeed);
-        _damage = new(_startDamage);
-        _health = new(_startHealth);
-        _uiHealth.Setup(_health);
-        _counter = new(_uiCounterCount);
+        Speed = new(_startSpeed);
+        Damage = new(_startDamage);
+        Health = new(_startHealth);
+        _uiHealth.Setup(Health);
+        CounterCount = new(_uiCounterCount);
+        CounterSpeed = new(_uiCounterSpeed);
+        CounterSpeed.Set(Speed.Value);
+        CounterDamage = new(_uiCounterDamage);
+        CounterDamage.Set(Damage.Value);
     }
 
     private bool _isEnemyDetected = false;
 
     private void FixedUpdate()
     {
+        if (_gamePlay.State == GameStateType.Death)
+            return;
+
         RaycastHit2D hit = Physics2D.Raycast(_parentPoolWeapons.transform.position, Vector2.right, _raycastDistance, _enemyLayer);
-        bool enemyIsPresent = (hit.collider != null);
+        bool enemyIsPresent = hit.collider != null;
 
         if (enemyIsPresent && !_isEnemyDetected)
         {
@@ -59,7 +73,7 @@ public class Player : MonoBehaviour
             Run();
         }
 
-        if (enemyIsPresent && _speed.TryShoot())
+        if (enemyIsPresent && Speed.TryShoot())
         {
             if (hit.collider.TryGetComponent(out Enemy enemy))
             {
@@ -67,9 +81,9 @@ public class Player : MonoBehaviour
                 enemy.Health.OnDied += Kill;
 
                 _weaponSpawner.Spawn()
-                    .Shoot(enemy.Target, _weaponPool, _damage.Value);
+                    .Shoot(enemy.Target, _weaponPool, Damage.Value);
                 
-                _speed.OnShot();
+                Speed.OnShot();
             }
         }
     }
@@ -87,7 +101,7 @@ public class Player : MonoBehaviour
     public void Kill(Health health)
     {
         health.OnDied -= Kill;
-        _counter.Increase(_countForKill);
+        CounterCount.Increase(_countForKill);
     }
 
     private void OnDrawGizmos()

@@ -20,5 +20,5 @@ public class EnemyPoolHandler : Pool<Enemy>
     public static void ReturnAction(Enemy @object) => @object.Hide();
 
     public override Enemy GetFirst()
-        => Queue.FirstOrDefault(ball => ball.gameObject.activeSelf == false);
+        => Queue.FirstOrDefault(enemy => enemy.gameObject.activeSelf == false && (enemy.Health == null || enemy.Health.IsAlive == false));
 }

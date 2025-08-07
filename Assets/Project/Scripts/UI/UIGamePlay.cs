@@ -8,27 +8,21 @@ public class UIGamePlay : MonoBehaviour
     [SerializeField] private TMP_Text _scoreCount;
 
     [Header("Cards")]
-    [SerializeField] private Transform _cardsPanel;
+    [SerializeField] private UICards _uiCards;
 
     [Header("Player State")]
     [SerializeField] private Transform _playerStatePanel;
     [SerializeField] private TMP_Text _speedCount;
     [SerializeField] private TMP_Text _powerCount;
 
+    [Header("Player State")]
+    [field: SerializeField] public Transform GameOver { get; private set; }
+
     public void Setup()
     {
         _scorePanel.Show();
         _playerStatePanel.Show();
-        HideCards();
-    }
-
-    private void ShowCards()
-    { 
-        _cardsPanel.Show();
-    }
-
-    private void HideCards()
-    {
-        _cardsPanel.Hide();
+        _uiCards.HideCards();
+        GameOver.Hide();
     }
 }

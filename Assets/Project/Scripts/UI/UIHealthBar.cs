@@ -18,11 +18,16 @@ public class UIHealthBar : MonoBehaviour
         _health.OnChangedHealth += ChangedHealth;
         _health.OnIncreaseHealth += IncreaseHealth;
 
-        IncreaseHealth();
+        _slider.maxValue = _health.MaxHealth;
+        _slider.value = _health.MaxHealth;
+        ShowCount();
     }
 
     private void OnDisable()
     {
+        if (_health == null)
+            return;
+
         _tween.Kill();
         _slider.value = _slider.maxValue;
         _health.OnChangedHealth -= ChangedHealth;
