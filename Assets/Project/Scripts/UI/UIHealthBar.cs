@@ -11,6 +11,8 @@ public class UIHealthBar : MonoBehaviour
 
     [SerializeField] private Slider _slider;
     [SerializeField] private TMP_Text _count;
+    [SerializeField] private float _flyDistance = 50f;
+    [SerializeField] private float _flyDuration = 1f;
 
     public void Setup(Health health)
     {
@@ -34,10 +36,35 @@ public class UIHealthBar : MonoBehaviour
         _health.OnIncreaseHealth -= IncreaseHealth;
     }
 
-    private void ChangedHealth()
+    private void ChangedHealth(int value)
     {
         _tween = _slider.DOValue(_health.Value, SPEED);
         ShowCount();
+
+        SpawnDamageText(value);
+    }
+
+    private void SpawnDamageText(int damageValue)
+    {
+        GameObject textObject = DamageTextPooler.Instance.GetDamageText();
+
+        textObject.transform.SetParent(textObject.transform);
+
+        textObject.transform.position = transform.position;
+        textObject.GetComponent<TMP_Text>().text = damageValue.ToString();
+        CanvasGroup canvasGroup = textObject.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 1f;
+
+        float randomX = Random.Range(-1f, 1f);
+        Vector3 randomDirection = new Vector3(randomX, 1f, 0f).normalized;
+        Vector3 targetPosition = textObject.transform.localPosition + randomDirection * _flyDistance;
+
+        Sequence sequence = DOTween.Sequence();
+
+        sequence.Append(textObject.transform.DOLocalMove(targetPosition, _flyDuration).SetEase(Ease.OutQuad));
+        sequence.Join(canvasGroup.DOFade(0f, _flyDuration));
+
+        sequence.OnComplete(() => DamageTextPooler.Instance.ReturnToPool(textObject));
     }
 
     private void IncreaseHealth()

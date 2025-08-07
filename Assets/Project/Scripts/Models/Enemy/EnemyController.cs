@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.Generic; // Добавляем using для List
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,11 +18,12 @@ public class EnemyController : MonoBehaviour
     private EnemySpawner _enemySpawner;
 
     [Header("Waves")]
-    [SerializeField] private WaveProperty[] _initialWaves; // Исходный массив волн
+    [SerializeField] private TMP_Text _waveName;
+    [SerializeField] private WaveProperty[] _initialWaves;
     [SerializeField] private float _delayBetweenWaves = 5f;
-    [SerializeField, Range(0.1f, 1f)] private float _endlessModeIncrease = 0.1f; // 10%
+    [SerializeField, Range(0.1f, 1f)] private float _endlessModeIncrease = 0.1f;
 
-    private List<WaveProperty> _waves; // Динамический список волн
+    private List<WaveProperty> _waves;
     private int _currentWaveIndex = 0;
     private Coroutine _spawnCoroutine;
     private int _enemiesAliveInWave = 0;
@@ -33,13 +35,11 @@ public class EnemyController : MonoBehaviour
         _enemyPool = new EnemyPoolHandler(_prefabEnemy, _parentBallEnemies, _startEnemyCount);
         _enemySpawner = new(_enemyPool);
         
-        // Копируем начальные волны в динамический список
         _waves = new List<WaveProperty>(_initialWaves);
         
         StartNextWave();
     }
     
-    // Метод для снятия паузы
     public void Continue()
     {
         _isPause = false;
@@ -47,7 +47,7 @@ public class EnemyController : MonoBehaviour
 
     private void StartNextWave()
     {
-        if (_currentWaveIndex < _waves.Count) // Используем .Count для списка
+        if (_currentWaveIndex < _waves.Count)
         {
             if (_spawnCoroutine != null)
             {
@@ -58,7 +58,6 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            // Если все волны пройдены, начинаем бесконечный режим
             Debug.Log("Все предопределенные волны пройдены! Запускаем бесконечный режим.");
             StartEndlessMode();
         }
@@ -71,10 +70,8 @@ public class EnemyController : MonoBehaviour
             StopCoroutine(_spawnCoroutine);
         }
 
-        // Берем последнюю волну из списка
         WaveProperty lastWave = _waves[_waves.Count - 1];
 
-        // Создаем новую волну, увеличивая все параметры
         WaveProperty newWave = new WaveProperty(
             Mathf.RoundToInt(lastWave.EnemyCount * (1 + _endlessModeIncrease)),
             lastWave.SpawnInterval,
@@ -82,10 +79,8 @@ public class EnemyController : MonoBehaviour
             lastWave.HealthMultiplier * (1 + _endlessModeIncrease)
         );
 
-        // Добавляем новую волну в список!
         _waves.Add(newWave);
         
-        // Запускаем спаун последней добавленной волны
         _spawnCoroutine = StartCoroutine(SpawnWave(_waves[_waves.Count - 1]));
     }
 
@@ -106,6 +101,7 @@ public class EnemyController : MonoBehaviour
             yield return new WaitForSeconds(_delayBetweenWaves);
         }
 
+        _waveName.text = $"Волна {_currentWaveIndex + 1}";
         Debug.Log($"Старт волны {_currentWaveIndex + 1}!");
 
         _enemiesAliveInWave = wave.EnemyCount;

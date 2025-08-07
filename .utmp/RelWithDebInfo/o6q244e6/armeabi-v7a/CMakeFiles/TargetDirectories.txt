@@ -1,0 +1,8 @@
+G:/Unity/CupHeroes_test/.utmp/RelWithDebInfo/o6q244e6/armeabi-v7a/CMakeFiles/edit_cache.dir
+G:/Unity/CupHeroes_test/.utmp/RelWithDebInfo/o6q244e6/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+G:/Unity/CupHeroes_test/.utmp/RelWithDebInfo/o6q244e6/armeabi-v7a/GameActivity/CMakeFiles/game.dir
+G:/Unity/CupHeroes_test/.utmp/RelWithDebInfo/o6q244e6/armeabi-v7a/GameActivity/CMakeFiles/edit_cache.dir
+G:/Unity/CupHeroes_test/.utmp/RelWithDebInfo/o6q244e6/armeabi-v7a/GameActivity/CMakeFiles/rebuild_cache.dir
+G:/Unity/CupHeroes_test/.utmp/RelWithDebInfo/o6q244e6/armeabi-v7a/FramePacing/CMakeFiles/swappywrapper.dir
+G:/Unity/CupHeroes_test/.utmp/RelWithDebInfo/o6q244e6/armeabi-v7a/FramePacing/CMakeFiles/edit_cache.dir
+G:/Unity/CupHeroes_test/.utmp/RelWithDebInfo/o6q244e6/armeabi-v7a/FramePacing/CMakeFiles/rebuild_cache.dir

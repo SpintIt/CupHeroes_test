@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class SpeedShoot
 {
-    private float _startValue;
     private float _value = .5f;
 
     private float _shootTimer;
@@ -12,7 +11,7 @@ public class SpeedShoot
 
     public SpeedShoot(float startSpeed)
     { 
-        _startValue = _value = startSpeed;
+        _value = startSpeed;
     }
 
     public void IncreaseSpeed(float percent)
@@ -21,7 +20,6 @@ public class SpeedShoot
             return;
 
         _value += _value - _value * percent;
-        Debug.Log(_value);
     }
 
     public bool TryShoot()

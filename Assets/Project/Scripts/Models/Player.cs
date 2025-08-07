@@ -1,3 +1,4 @@
+using DG.Tweening; // Необходимо добавить
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -33,6 +34,11 @@ public class Player : MonoBehaviour
     public Counter CounterSpeed { get; private set; }
     public Counter CounterDamage { get; private set; }
 
+    [Header("Wobble Animation")]
+    [SerializeField] private float _wobbleAngle = 5f;
+    [SerializeField] private float _wobbleDuration = 1f;
+    private Tween _wobbleTween;
+
     public event UnityAction OnRun;
     public event UnityAction OnStop;
 
@@ -50,6 +56,8 @@ public class Player : MonoBehaviour
         CounterSpeed.Set(Speed.Value);
         CounterDamage = new(_uiCounterDamage);
         CounterDamage.Set(Damage.Value);
+
+        StartWobbleAnimation();
     }
 
     private bool _isEnemyDetected = false;
@@ -66,11 +74,13 @@ public class Player : MonoBehaviour
         {
             _isEnemyDetected = true;
             Stop();
+            StopWobbleAnimation();
         }
         else if (!enemyIsPresent && _isEnemyDetected)
         {
             _isEnemyDetected = false;
             Run();
+            StartWobbleAnimation();
         }
 
         if (enemyIsPresent && Speed.TryShoot())
@@ -82,7 +92,7 @@ public class Player : MonoBehaviour
 
                 _weaponSpawner.Spawn()
                     .Shoot(enemy.Target, _weaponPool, Damage.Value);
-                
+
                 Speed.OnShot();
             }
         }
@@ -102,6 +112,25 @@ public class Player : MonoBehaviour
     {
         health.OnDied -= Kill;
         CounterCount.Increase(_countForKill);
+    }
+
+    private void StartWobbleAnimation()
+    {
+        if (_wobbleTween != null && _wobbleTween.IsActive())
+            return;
+
+        _wobbleTween = transform.DORotate(new Vector3(0, 0, _wobbleAngle), _wobbleDuration / 2)
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo);
+    }
+
+    private void StopWobbleAnimation()
+    {
+        if (_wobbleTween != null && _wobbleTween.IsActive())
+        {
+            _wobbleTween.Kill();
+            transform.rotation = Quaternion.identity;
+        }
     }
 
     private void OnDrawGizmos()

@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening; // Необходимо добавить
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -8,14 +9,20 @@ public class Enemy : MonoBehaviour
 
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField, Range(1f, 5f)] public int Damage { get; private set; }
-    
-    // Р”РѕР±Р°РІР»СЏРµРј РїРѕР»СЏ РґР»СЏ РїРµСЂРёРѕРґРёС‡РµСЃРєРѕРіРѕ СѓСЂРѕРЅР°
+
     [SerializeField, Range(0.1f, 2f)] private float _attackInterval = 1f;
     private Coroutine _attackCoroutine;
 
     [SerializeField] private UIHealthBar _uiHealthBar;
     [SerializeField, Range(10, 100)] private int _startHealth = 20;
     [SerializeField, Range(.1f, 2f)] private float _startSpeedMove = .2f;
+
+    [Header("Movement Animation")]
+    [SerializeField] private float _jumpHeight = 0.5f; // Насколько высоко подпрыгивает
+    [SerializeField] private float _animDuration = 0.5f; // Длительность одного цикла анимации
+
+    private Tween _jumpTween;
+    private float _startLocalYPosition;
 
     public Health Health { get; private set; }
     public SpeedMove SpeedMove { get; private set; }
@@ -31,6 +38,11 @@ public class Enemy : MonoBehaviour
 
         SpeedMove = new(_startSpeedMove);
         EnemyMover = new(SpeedMove, this);
+
+        // Сохраняем исходную Y-позицию для анимации
+        _startLocalYPosition = transform.localPosition.y;
+
+        StartMoveAnimation();
     }
 
     private void Update()
@@ -54,7 +66,8 @@ public class Enemy : MonoBehaviour
         else if (collision.TryGetComponent(out Player player))
         {
             _isMove = false;
-            // Р—Р°РїСѓСЃРєР°РµРј РєРѕСЂСѓС‚РёРЅСѓ РґР»СЏ РЅР°РЅРµСЃРµРЅРёСЏ РїРµСЂРёРѕРґРёС‡РµСЃРєРѕРіРѕ СѓСЂРѕРЅР°
+            StopMoveAnimation();
+
             if (_attackCoroutine == null)
             {
                 _attackCoroutine = StartCoroutine(Attack(player));
@@ -67,7 +80,8 @@ public class Enemy : MonoBehaviour
         if (collision.TryGetComponent(out Player player))
         {
             _isMove = true;
-            // РћСЃС‚Р°РЅР°РІР»РёРІР°РµРј РєРѕСЂСѓС‚РёРЅСѓ, РєРѕРіРґР° РёРіСЂРѕРє РІС‹С…РѕРґРёС‚ РёР· Р·РѕРЅС‹
+            StartMoveAnimation();
+
             if (_attackCoroutine != null)
             {
                 StopCoroutine(_attackCoroutine);
@@ -76,7 +90,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // РљРѕСЂСѓС‚РёРЅР° РґР»СЏ РЅР°РЅРµСЃРµРЅРёСЏ СѓСЂРѕРЅР°
     private IEnumerator Attack(Player player)
     {
         while (player.Health.IsAlive)
@@ -84,8 +97,24 @@ public class Enemy : MonoBehaviour
             player.Health.TakeDamage(Damage);
             yield return new WaitForSeconds(_attackInterval);
         }
-        
-        // РћСЃС‚Р°РЅР°РІР»РёРІР°РµРј РєРѕСЂСѓС‚РёРЅСѓ, РµСЃР»Рё РёРіСЂРѕРє СѓРјРµСЂ
+
         _attackCoroutine = null;
+    }
+
+    private void StartMoveAnimation()
+    {
+        _jumpTween = transform.DOLocalMoveY(_startLocalYPosition + _jumpHeight, _animDuration)
+            .SetEase(Ease.OutQuad)
+            .SetLoops(-1, LoopType.Yoyo);
+    }
+
+    private void StopMoveAnimation()
+    {
+        if (_jumpTween != null && _jumpTween.IsActive())
+        {
+            _jumpTween.Kill();
+            // Возвращаем объект к его исходной позиции
+            transform.localPosition = new Vector3(transform.localPosition.x, _startLocalYPosition, transform.localPosition.z);
+        }
     }
 }

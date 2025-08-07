@@ -117,6 +117,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _slider: {fileID: 6839871451671383716}
   _count: {fileID: 915006651865203351}
+  _flyDistance: 100
+  _flyDuration: 1
 --- !u!1 &1506926368058657395
 GameObject:
   m_ObjectHideFlags: 0
@@ -646,6 +648,8 @@ MonoBehaviour:
   _uiHealthBar: {fileID: 2031612815748720743}
   _startHealth: 20
   _startSpeedMove: 0.4
+  _jumpHeight: 0.1
+  _animDuration: 0.5
 --- !u!61 &3745179658247503325
 BoxCollider2D:
   m_ObjectHideFlags: 0

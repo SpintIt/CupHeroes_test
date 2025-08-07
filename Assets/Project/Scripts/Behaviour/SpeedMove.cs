@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class SpeedMove
+﻿public class SpeedMove
 {
     private float _value = .5f;
 

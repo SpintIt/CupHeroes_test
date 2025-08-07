@@ -48,9 +48,7 @@ public class UICards : MonoBehaviour
     {
         TrySpend(() =>
         {
-            Debug.Log(_player.Damage.Value);
             _player.Damage.IncreaseDamage(1.2f);
-            Debug.Log(_player.Damage.Value);
             _player.CounterDamage.Set(_player.Damage.Value);
         });
     }
