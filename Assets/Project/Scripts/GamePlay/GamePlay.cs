@@ -1,16 +1,14 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GamePlay : MonoBehaviour
 {
-private bool _isPlay;
+    private GameStateType _state;
 
-    [Header("Pool Balls")]
-    [SerializeField, Range(1, 50)] private int _startBallCount = 10;
-    [SerializeField] private Transform _parentBallSignals;
-    [SerializeField] private Enemy _prefabBall;
-    private BallPoolHandler _ballPool;
-    private BallSpawner _ballSpawner;
-    private Ball _currentBall;
+    [SerializeField] private Scroller _scrollerBackground;
+    [SerializeField] private Player _player;
+    [SerializeField] private EnemyController _enemyController;
+    /*private Ball _currentBall;
 
     [Header("Pendulum")]
     [SerializeField] private Pendulum _pendulum;
@@ -29,26 +27,57 @@ private bool _isPlay;
     [Header("Application")]
     [SerializeField] private EventSystem _eventSystem;
 
-    public MatchThree MatchThree { get; private set; }
+    public MatchThree MatchThree { get; private set; }*/
 
     public void Init()
     {
-        _isPlay = false;
+        _state = GameStateType.Run;
 
-        _uiGameOver.Hide();
+        _player.Init();
+
+        _player.OnRun += Run;
+        _player.OnStop += Stop;
+
+        _enemyController.Init();
+
+        /*_uiGameOver.Hide();
 
         MatchThree = new();
 
-        _eventSystem.Init();
+        _eventSystem.Init();*/
 
-        _ballPool = new BallPoolHandler(_prefabBall, _parentBallSignals, _startBallCount);
-        _ballSpawner = new(_ballPool);
-        _scoreCounter = new(_uiScorePanel, MatchThree, _scoresForColor);
+        /*_enemyPool = new EnemyPoolHandler(_prefabEnemy, _parentBallEnemies, _startEnemyCount);
+        _enemySpawner = new(_enemyPool);*/
+        /*_scoreCounter = new(_uiScorePanel, MatchThree, _scoresForColor);*/
 
         /* _eventSystem.OnClick += OnClick;
         _eventSystem.PressAnyKey += OnPressAnyKey;
         MatchThree.OnRemoveBall += RemoveBalls;
         MatchThree.OnGameOver += OnGameOver; */
+    }
+
+    private void OnDestroy()
+    {
+        _player.OnRun -= Run;
+        _player.OnStop -= Stop;
+    }
+
+    private void Update()
+    {
+        if (_state == GameStateType.Run)
+        {
+            _scrollerBackground.Handler();
+        }
+    }
+
+    private void Run()
+    {
+        _state = GameStateType.Run;
+    }
+
+    private void Stop()
+    {
+        _state = GameStateType.Stop;
     }
 
     /* private void OnDestroy()

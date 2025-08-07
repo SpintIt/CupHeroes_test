@@ -1,63 +1,49 @@
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIHealthBar : MonoBehaviour
 {
-    private GameManager _gameManager;
+    private Tween _tween;
     private const float SPEED = .5f;
-    private Tweener _tweener;
+    private Health _health;
 
-    [SerializeField] private Health _health;
     [SerializeField] private Slider _slider;
+    [SerializeField] private TMP_Text _count;
 
-    public Tweener DoShakeTween { get; private set; }
-
-    private void OnEnable()
+    public void Setup(Health health)
     {
-        _gameManager.OnPauseGame += StopAnimate;
-        _gameManager.OnContinueGame += StartAnimate;
-        _health.OnChangedHealth += OnChangedHealth;
+        _health = health;
+        _health.OnChangedHealth += ChangedHealth;
+        _health.OnIncreaseHealth += IncreaseHealth;
+
+        IncreaseHealth();
     }
 
     private void OnDisable()
     {
-        _gameManager.OnPauseGame -= StopAnimate;
-        _gameManager.OnContinueGame -= StartAnimate;
-        _health.OnChangedHealth -= OnChangedHealth;
+        _tween.Kill();
+        _slider.value = _slider.maxValue;
+        _health.OnChangedHealth -= ChangedHealth;
+        _health.OnIncreaseHealth -= IncreaseHealth;
     }
 
-    private void OnDestroy()
+    private void ChangedHealth()
     {
-        _tweener.Kill();
-        _gameManager.OnPauseGame -= StopAnimate;
-        _gameManager.OnContinueGame -= StartAnimate;
-        _health.OnChangedHealth -= OnChangedHealth;
+        _tween = _slider.DOValue(_health.Value, SPEED);
+        ShowCount();
     }
 
-    private void Awake()
+    private void IncreaseHealth()
     {
         _slider.maxValue = _health.MaxHealth;
         _slider.value = _health.MaxHealth;
-
-        _tweener = transform.DOShakePosition(
-            10.0f, 
-            strength: new Vector3(.5f, .5f, 0), 
-            vibrato: 1, 
-            randomness: 5, 
-            snapping: false, 
-            fadeOut: false, 
-            randomnessMode: ShakeRandomnessMode.Harmonic
-        ).SetLoops(-1, LoopType.Yoyo);
+        ShowCount();
     }
 
-    protected virtual void StopAnimate()
-        => _tweener.Pause();
-
-    private void StartAnimate()
-        => _tweener.Play();
-
-    private void OnChangedHealth()
+    private void ShowCount()
     {
-        _slider.DOValue(_health.Value, SPEED);
+        _count.text = _health.Value.ToString();
     }
-
 }
